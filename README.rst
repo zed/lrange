@@ -1,11 +1,11 @@
-`lrange`
-========
+`lrange` - unlimited `xrange` in pure Python
+============================================
 
-Lazy range function for Python 2.x or `xrange` drop-in replacement for
-long integers
+`lrange` is a lazy range function for Python 2.x or `xrange` drop-in
+replacement for long integers.
 
 `lrange` is a pure Python analog of the builtin `range` function from
-Python 3.x
+Python 3.x.
 
     >>> from lrange import lrange
     >>> r = lrange(2**100, 2**101, 2**100)
