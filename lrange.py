@@ -64,7 +64,7 @@ class lrange(object):
     Traceback (most recent call last):
     ...
     OverflowError: long int too large to convert to int
-    >>> lrange(N).length() == N
+    >>> lrange(N).length == N
     True
     """
     def __new__(cls, *args):
@@ -110,10 +110,12 @@ class lrange(object):
 
     __len__ = length
 
+    length = property(length)
+
     def __getitem__(self, i):
         if i < 0:
-            i = i + self.length()
-        if i < 0 or i >= self.length():
+            i = i + self.length
+        if i < 0 or i >= self.length:
             raise IndexError("lrange object index out of range")
 
         return self._start + i * self._step
@@ -151,7 +153,7 @@ class lrange(object):
             return self._iterator()
 
     def _iterator(self):
-        len_ = self.length()
+        len_ = self.length
         i = 0
         while i < len_:
             yield self._start + i * self._step
@@ -159,7 +161,7 @@ class lrange(object):
 
 
     def __reversed__(self):
-        len_ = self.length()
+        len_ = self.length
         new_start = self._start + (len_ - 1) * self._step
         new_stop = self._start
         if self._step > 0:

@@ -21,8 +21,8 @@ def eq_lrange(a, b):
     assert a._start == b._start
     assert a._stop == b._stop
     assert a._step == b._step
-    assert a.length() == b.length()
-    if a.length() < 100:
+    assert a.length == b.length
+    if a.length < 100:
         assert list(a) == list(b)
         try:
              assert list(a) == range(a._start, a._stop, a._step)
@@ -145,18 +145,18 @@ def test_big_ints():
             pass
 
         ir = lrange(*args)
-        assert ir.length() == len_
+        assert ir.length == len_
         try:
-            assert ir.length() == len(ir)
+            assert ir.length == len(ir)
         except OverflowError:
             pass
         #
-        ir[ir.length()-1]
+        ir[ir.length-1]
         #
         if len(args) >= 2:
             r = range(*args)
             assert list(ir) == r
-            assert ir[ir.length()-1] == r[-1]
+            assert ir[ir.length-1] == r[-1]
             assert list(reversed(ir)) == list(reversed(r))
         #
 
@@ -168,7 +168,7 @@ def test_negative_index():
 
 def test_reversed():
     for r in _get_lranges():
-        if r.length() > 1000: continue # skip long
+        if r.length > 1000: continue # skip long
         assert list(reversed(reversed(r))) == list(r)
         assert list(r) == range(r._start, r._stop, r._step)
 
@@ -257,7 +257,7 @@ class _indices(object):
                     if N is not None:
                         s = s + N
                     lr = lrange(s)
-                    assert lr.length() == s
+                    assert lr.length == s
 
 def test_new():
     assert repr(lrange(True)) == repr(lrange(1))
