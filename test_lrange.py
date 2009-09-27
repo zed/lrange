@@ -8,7 +8,7 @@ Requires: nose (``$ easy_install nose``)
 """
 import sys
 
-from nose.tools import eq_ as eq, raises
+from nose.tools import assert_raises, eq_ as eq, raises
 
 from lrange import lrange
 
@@ -82,24 +82,18 @@ def test_kwarg():
     lrange(stop=10)
 
 
-@raises(TypeError, DeprecationWarning)
-def test_float_stop():
-    lrange(1.0)
-
-
-@raises(TypeError, DeprecationWarning)
-def test_float_step2():
-    lrange(-1, 2, 1.0)
-
-
-@raises(TypeError, DeprecationWarning)
-def test_float_start():
-    lrange(1.0, 2)
-
-
-@raises(TypeError, DeprecationWarning)
-def test_float_step():
-    lrange(1, 2, 1.0)
+def test_float_arg():
+    def _test(*args):
+        help(assert_raises)
+        lrange(*map(int, args))
+        assert_raises(TypeError, lrange, *args)
+    _test(1.0)
+    _test(1e10, 1e10)
+    _test(1e1, 1e1)
+    _test(-1, 2, 1.0)
+    _test(1.0, 2)
+    _test(1, 2, 1.0)
+    _test(1e100, 1e101, 1e101)
 
 
 @raises(TypeError)
