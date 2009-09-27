@@ -81,11 +81,7 @@ class lrange(object):
             start = toindex(args[0])
             stop = toindex(args[1])
             if nargs == 3:
-                step = args[2]
-                if step is None:
-                    step = 1
-
-                step = toindex(step)
+                step = toindex(args[2])
                 if step == 0:
                     raise ValueError("lrange() arg 3 must not be zero")
             else:
@@ -95,6 +91,9 @@ class lrange(object):
                              " got %s" % args)
 
         r = super(lrange, cls).__new__(cls)
+        assert start is not None
+        assert stop is not None
+        assert step is not None
         r._start, r._stop, r._step = start, stop, step
         return r
 

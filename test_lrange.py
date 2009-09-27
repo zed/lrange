@@ -8,7 +8,7 @@ Requires: nose (``$ easy_install nose``)
 """
 import sys
 
-from nose.tools import raises
+from nose.tools import eq_ as eq, raises
 
 from lrange import lrange
 
@@ -223,13 +223,88 @@ def test_repr():
         eq_lrange(eval(repr(r)), r)
 
 
+class _indices(object):
+    def __getitem__(self, slices):
+        # make sure slices is iterable
+        try: slices = iter(slices)
+        except TypeError:
+            slices = [slices]
+        # behaviour for short and long integers must be the same
+        for N in (None, 2**101):
+            for s in slices:
+                if type(s) == slice:
+                    start, stop, step = s.start, s.stop, s.step
+                    if N is not None:
+                        start = start and start+N
+                        stop = stop and stop+N
+                        step = step
+                    # try from 0 to 3 arguments
+                    for args in [(), (stop,), (start, stop),
+                                 (start, stop, step)]:
+                        try:
+                            lr = lrange(*args)
+                            if len(args) == 1:
+                                nstart, nstep, nstop = 0, 1, stop
+                                assert stop is not None
+                            if len(args) == 2:
+                                nstart, nstop, nstep = start, stop, 1
+                                assert start is not None
+                                assert stop is not None
+                            if len(args) == 3:
+                                nstart, nstop, nstep = start, stop, step
+                                assert start is not None
+                                assert stop is not None
+                                assert step is not None
+                            assert 0 <= len(args) < 4
+
+                            if type(lr) == lrange:
+                                eq(lr._start, nstart)
+                                eq(lr._stop, nstop)
+                                eq(lr._step, nstep)
+                            else:
+                                eq(list(lr), list(range(nstart, nstop,
+                                                        nstep)))
+
+                        except TypeError:
+                            # expected if any of the arguments is None
+                            if len(args) > 0:
+                                assert start is None or stop is None or \
+                                       step is None
+                else: # s is not slice
+                    assert s is not None
+                    if N is not None:
+                        s = s + N
+                    lr = lrange(s)
+                    if hasattr(lr, 'length'):
+                        assert lr.length() == s # long ints
+                    else:
+                        assert len(lr) == s     # short ints
+
 def test_new():
     assert repr(lrange(True)) == repr(lrange(1))
+    #
+    try:
+        lrange(None)
+        assert 0
+    except TypeError:
+        pass
+    #
+    _indices()[3,4:,:5,6:7,7:8,8:13:2,:,-1:,:-2,10:6:-2,::11,::]
+    _indices()[0,0:,:0,0:0]
 
+@raises(ValueError)
+def test_zero_step():
+    _indices()[1:2:0]
 
 def test_overflow():
-    lo, hi = sys.maxint-2, sys.maxint+3
-    assert list(lrange(lo, hi)) == list(range(lo, hi))
+    lo, hi, step = sys.maxint-2, 4*sys.maxint+3, sys.maxint // 10
+    lr = lrange(lo, hi, step)
+    xr = lrange(sys.maxint/4, sys.maxint/2, sys.maxint // 10)
+    assert type(xr) == xrange
+    assert type(xr) != lrange
+    assert type(lr) != xrange
+    assert type(lr) == lrange
+    assert list(lr) == list(range(lo, hi, step))
 
 
 def test_getitem():
