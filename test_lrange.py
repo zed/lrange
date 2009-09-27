@@ -18,30 +18,16 @@ def eq_lrange(a, b):
 
     Where `a`, `b` are `lrange` objects
     """
-    try:
-        assert a.length() == b.length()
-        assert a._start == b._start
-        assert a._stop == b._stop
-        assert a._step == b._step
-        if a.length() < 100:
-            assert list(a) == list(b)
-            try:
-                 assert list(a) == range(a._start, a._stop, a._step)
-            except OverflowError:
-                pass
-    except AttributeError:
-        if type(a) == xrange:
-            assert len(a) == len(b)
-            if len(a) == 0: # empty xrange
-                return
-            if len(a) > 0:
-                assert a[0] == b[0]
-            if len(a) > 1:
-                a = lrange(a[0], a[-1], a[1] - a[0])
-                b = lrange(b[0], b[-1], b[1] - b[0])
-                eq_lrange(a, b)
-        else:
-            raise
+    assert a._start == b._start
+    assert a._stop == b._stop
+    assert a._step == b._step
+    assert a.length() == b.length()
+    if a.length() < 100:
+        assert list(a) == list(b)
+        try:
+             assert list(a) == range(a._start, a._stop, a._step)
+        except OverflowError:
+            pass
 
 
 def _get_short_lranges_args():
@@ -182,7 +168,6 @@ def test_negative_index():
 
 def test_reversed():
     for r in _get_lranges():
-        if type(r) == xrange: continue # known not to work for xrange
         if r.length() > 1000: continue # skip long
         assert list(reversed(reversed(r))) == list(r)
         assert list(r) == range(r._start, r._stop, r._step)
@@ -257,13 +242,10 @@ class _indices(object):
                                 assert step is not None
                             assert 0 <= len(args) < 4
 
-                            if type(lr) == lrange:
-                                eq(lr._start, nstart)
-                                eq(lr._stop, nstop)
-                                eq(lr._step, nstep)
-                            else:
-                                eq(list(lr), list(range(nstart, nstop,
-                                                        nstep)))
+                            eq(lr._start, nstart)
+                            eq(lr._stop, nstop)
+                            eq(lr._step, nstep)
+                            eq(list(lr), list(range(nstart, nstop, nstep)))
 
                         except TypeError:
                             # expected if any of the arguments is None
@@ -275,10 +257,7 @@ class _indices(object):
                     if N is not None:
                         s = s + N
                     lr = lrange(s)
-                    if hasattr(lr, 'length'):
-                        assert lr.length() == s # long ints
-                    else:
-                        assert len(lr) == s     # short ints
+                    assert lr.length() == s
 
 def test_new():
     assert repr(lrange(True)) == repr(lrange(1))
@@ -300,10 +279,6 @@ def test_overflow():
     lo, hi, step = sys.maxint-2, 4*sys.maxint+3, sys.maxint // 10
     lr = lrange(lo, hi, step)
     xr = lrange(sys.maxint/4, sys.maxint/2, sys.maxint // 10)
-    assert type(xr) == xrange
-    assert type(xr) != lrange
-    assert type(lr) != xrange
-    assert type(lr) == lrange
     assert list(lr) == list(range(lo, hi, step))
 
 

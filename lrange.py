@@ -39,7 +39,6 @@ class lrange(object):
     """lrange([start,] stop[, step]) -> lrange object
 
     Return an iterator that generates the numbers in the range on demand.
-    Return `xrange` for small integers
 
     Pure Python implementation of py3k's `range()`.
 
@@ -69,9 +68,6 @@ class lrange(object):
     True
     """
     def __new__(cls, *args):
-        try: return xrange(*args) # use `xrange` for small integers
-        except OverflowError: pass
-
         nargs = len(args)
         if nargs == 1:
             stop = toindex(args[0])
@@ -114,7 +110,7 @@ class lrange(object):
 
     __len__ = length
 
-    def __getitem__(self, i): # for L[:] = lrange(..)
+    def __getitem__(self, i):
         if i < 0:
             i = i + self.length()
         if i < 0 or i >= self.length():
@@ -148,11 +144,19 @@ class lrange(object):
             return ((ob - self._start) % self._step) == 0
 
     def __iter__(self):
+        try:
+            return iter(xrange(self._start, self._stop,
+                               self._step)) # use `xrange`'s iterator
+        except OverflowError:
+            return self._iterator()
+
+    def _iterator(self):
         len_ = self.length()
         i = 0
         while i < len_:
             yield self._start + i * self._step
             i += 1
+
 
     def __reversed__(self):
         len_ = self.length()
