@@ -17,12 +17,13 @@ Development Status :: 2 - Pre-Alpha
 Intended Audience :: Developers
 License :: OSI Approved :: MIT License
 Operating System :: OS Independent
-Programming Language :: Python
+Programming Language :: Python :: 2
+Programming Language :: Python :: 3
 Topic :: Software Development :: Libraries :: Python Modules
 """
 
 NAME             = 'lrange'
-VERSION          = '0.0.3.dev'
+VERSION          = '0.0.4.dev'
 DESCRIPTION      = _readme_lines[0]
 LONG_DESCRIPTION = "\n".join(_readme_lines[2:])
 URL              = "http://github.com/zed/lrange/"
