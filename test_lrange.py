@@ -83,9 +83,8 @@ def test_kwarg():
 
 def test_float_arg():
     def _test(*args):
-        help(assert_raises)
-        lrange(*map(int, args))
-        assert_raises(TypeError, lrange, *args)
+        lrange(*map(int, args)) # args work as ints
+        assert_raises(TypeError, lrange, *args) # args raise TypeError as floats
     _test(1.0)
     _test(1e10, 1e10)
     _test(1e1, 1e1)
@@ -93,6 +92,20 @@ def test_float_arg():
     _test(1.0, 2)
     _test(1, 2, 1.0)
     _test(1e100, 1e101, 1e101)
+
+
+def test_int_subclass_args():
+    class Int(int):
+        pass
+    class Long(long):
+        pass
+
+    for args in [ (Int(10,),),
+                  (Int(1), Int(2), Int(1)),
+                  (Long(1),),
+                  (1, 2, Long(1e100)),
+                  (True,),]:
+        lrange(*args)
 
 
 @raises(TypeError)

@@ -24,15 +24,20 @@ True
 True
 """
 
+try: long
+except NameError:
+    long = int # Python 3.x
 
 def _toindex(arg):
     """Convert `arg` to integer type that could be used as an index.
 
     """
-    if not any(isinstance(arg, cls) for cls in (long, int, bool)):
-        raise TypeError("'%s' object cannot be interpreted as an integer" % (
-            type(arg).__name__,))
-    return int(arg)
+    for cls in (int, long):
+        if isinstance(arg, cls): # allow int subclasses
+           return int(arg)
+
+    raise TypeError("'%s' object cannot be interpreted as an integer" % (
+        type(arg).__name__,))
 
 
 class lrange(object):
@@ -151,7 +156,7 @@ class lrange(object):
         try:
             return iter(xrange(self._start, self._stop,
                                self._step)) # use `xrange`'s iterator
-        except OverflowError:
+        except (NameError, OverflowError):
             return self._iterator()
 
     def _iterator(self):
