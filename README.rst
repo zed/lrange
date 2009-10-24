@@ -1,4 +1,4 @@
-`lrange` - unlimited `xrange` in pure Python
+lrange - unlimited xrange in pure Python
 ============================================
 
 `lrange` is a lazy range function for Python 2.x or `xrange` drop-in

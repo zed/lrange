@@ -15,20 +15,19 @@ _readme_lines = read_file("README.rst").splitlines()
 CLASSIFIERS = """\
 Development Status :: 2 - Pre-Alpha
 Intended Audience :: Developers
-License :: OSI Approved
+License :: OSI Approved :: MIT License
+Operating System :: OS Independent
 Programming Language :: Python
-Topic :: Software Development
-Operating System :: Microsoft :: Windows
-Operating System :: POSIX
-Operating System :: Unix
-Operating System :: MacOS
+Topic :: Software Development :: Libraries :: Python Modules
 """
 
 NAME             = 'lrange'
-VERSION          = '0.0.2.dev'
+VERSION          = '0.0.3.dev'
 DESCRIPTION      = _readme_lines[0]
 LONG_DESCRIPTION = "\n".join(_readme_lines[2:])
 URL              = "http://github.com/zed/lrange/"
+DOWNLOAD_URL     = ("http://pypi.python.org/packages/source/l/lrange/"
+                    "lrange-%s.tar.gz" % (VERSION,))
 LICENSE          = 'MIT'
 CLASSIFIERS      = filter(len, CLASSIFIERS.split('\n'))
 AUTHOR           = "zed"
@@ -41,12 +40,16 @@ setup(
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     url=URL,
+    download_url=DOWNLOAD_URL,
     license=LICENSE,
     classifiers=CLASSIFIERS,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
+    maintainer=AUTHOR,
+    maintainer_email=AUTHOR_EMAIL,
     platforms=PLATFORMS,
-    tests_require=['nose'],
-    test_suite="nose.collector",      # for ``setup.py test`` command
+    tests_require=['nose'], #NOTE: setup.py test might fail on the first attempt
+    test_suite="nose.collector",
     py_modules=[NAME],
+    provides=[NAME],
 )
