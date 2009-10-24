@@ -67,7 +67,6 @@ def _get_lranges_args():
             for step in range(-N//2, N, N//8+1)]
 
 
-
 def _get_short_lranges():
     return [lrange(*args) for args in _get_short_lranges_args()]
 
@@ -169,9 +168,10 @@ def test_reversed():
 
 def test_pickle():
     import pickle
-    for r in _get_lranges():
-        rp = pickle.loads(pickle.dumps(r))
-        eq_lrange(rp, r)
+    for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+        for r in _get_lranges():
+            rp = pickle.loads(pickle.dumps(r, proto))
+            eq_lrange(rp, r)
 
 
 def test_equility():
@@ -179,6 +179,9 @@ def test_equility():
         a, b = lrange(*args), lrange(*args)
         assert a is not b
         assert a != b
+        assert a.length == b.length
+        if a.length < 1000: # skip long
+            assert list(a) == list(b), (a, b)
         eq_lrange(a, b)
 
 
