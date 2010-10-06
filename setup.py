@@ -13,7 +13,7 @@ def read_file(relpath):
 _readme_lines = read_file("README.rst").splitlines()
 
 CLASSIFIERS = """\
-Development Status :: 2 - Pre-Alpha
+Development Status :: 4 - Beta
 Intended Audience :: Developers
 License :: OSI Approved :: MIT License
 Operating System :: OS Independent
@@ -23,7 +23,7 @@ Topic :: Software Development :: Libraries :: Python Modules
 """
 
 NAME             = 'lrange'
-VERSION          = '0.0.4.dev'
+VERSION          = '0.0.5'
 DESCRIPTION      = _readme_lines[0]
 LONG_DESCRIPTION = "\n".join(_readme_lines[2:])
 URL              = "http://github.com/zed/lrange/"
