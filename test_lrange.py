@@ -4,7 +4,7 @@ Usage:
 
     $ python -W error test_lrange.py --with-doctest
 
-Requires: nose (``$ easy_install nose``)
+Requires: nose (``$ pip install nose``)
 """
 import sys
 

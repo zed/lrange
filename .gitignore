@@ -1,3 +1,6 @@
-lrange.egg-info/
+*.egg-info/
 dist/
 build/
+.tox/
+*.egg/
+*.py[co]

@@ -28,6 +28,14 @@ try: long
 except NameError:
     long = int # Python 3.x
 
+try: any
+except NameError:
+    def any(iterable): # for Python 2.4
+        for i in iterable:
+            if i:
+                return True
+        return False
+
 def _toindex(arg):
     """Convert `arg` to integer type that could be used as an index.
 
@@ -59,13 +67,13 @@ class lrange(object):
     >>> N = 10**80
     >>> len(range(N, N+3))
     3
-    >>> len(xrange(N, N+3))
+    >>> len(xrange(N, N+3)) #doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     OverflowError: long int too large to convert to int
     >>> len(lrange(N, N+3))
     3
-    >>> xrange(N)
+    >>> xrange(N)           #doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
     OverflowError: long int too large to convert to int
