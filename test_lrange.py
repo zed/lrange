@@ -6,7 +6,21 @@ Usage:
 
 Requires: nose (``$ pip install nose``)
 """
+import pickle
 import sys
+
+try: long
+except NameError:
+    long = int # Python 3.x
+
+try: xrange
+except NameError:
+    xrange = range # Python 3.x
+
+if hasattr(sys, "maxint"):
+    MAXINT = sys.maxint
+else:
+    MAXINT = sys.maxsize # Python 3.x
 
 from nose.tools import assert_raises, eq_ as eq, raises
 
@@ -25,7 +39,7 @@ def eq_lrange(a, b):
     if a.length < 100:
         assert list(a) == list(b)
         try:
-             assert list(a) == range(a._start, a._stop, a._step)
+             assert list(a) == list(range(a._start, a._stop, a._step))
         except OverflowError:
             pass
 
@@ -136,7 +150,6 @@ def test_small_ints():
         assert len(ir) == len(r)
         assert list(ir) == list(r)
 
-
 def test_big_ints():
     N = 10**100
     for args, len_ in [
@@ -144,12 +157,6 @@ def test_big_ints():
         [(N, N+10), 10],
         [(N, N-10, -2), 5],
         ]:
-        try:
-            xrange(*args)
-            assert 0
-        except OverflowError:
-            pass
-
         ir = lrange(*args)
         assert ir.length == len_
         try:
@@ -161,7 +168,7 @@ def test_big_ints():
         #
         if len(args) >= 2:
             r = range(*args)
-            assert list(ir) == r
+            assert list(ir) == list(r)
             assert ir[ir.length-1] == r[-1]
             assert list(reversed(ir)) == list(reversed(r))
         #
@@ -176,11 +183,10 @@ def test_reversed():
     for r in _get_lranges():
         if r.length > 1000: continue # skip long
         assert list(reversed(reversed(r))) == list(r)
-        assert list(r) == range(r._start, r._stop, r._step)
+        assert list(r) == list(range(r._start, r._stop, r._step))
 
 
 def test_pickle():
-    import pickle
     for proto in range(pickle.HIGHEST_PROTOCOL + 1):
         for r in _get_lranges():
             rp = pickle.loads(pickle.dumps(r, proto))
@@ -286,14 +292,14 @@ def test_zero_step():
     _indices()[1:2:0]
 
 def test_overflow():
-    lo, hi, step = sys.maxint-2, 4*sys.maxint+3, sys.maxint // 10
+    lo, hi, step = MAXINT-2, 4*MAXINT+3, MAXINT // 10
     lr = lrange(lo, hi, step)
-    xr = lrange(sys.maxint/4, sys.maxint/2, sys.maxint // 10)
+    xr = lrange(MAXINT//4, MAXINT//2, MAXINT // 10)
     assert list(lr) == list(range(lo, hi, step))
 
 
 def test_getitem():
-    r = lrange(sys.maxint-2, sys.maxint+3)
+    r = lrange(MAXINT-2, MAXINT+3)
     L = []
     L[:] = r
     assert len(L) == len(r)

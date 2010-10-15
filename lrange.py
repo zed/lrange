@@ -5,8 +5,8 @@
 See help(lrange.lrange)
 
 >>> r = lrange(2**100, 2**101, 2**100)
->>> len(r)
-1
+>>> len(r) == 1
+True
 >>> for i in r:
 ...     print i,
 1267650600228229401496703205376
@@ -71,8 +71,8 @@ class lrange(object):
     Traceback (most recent call last):
     ...
     OverflowError: long int too large to convert to int
-    >>> len(lrange(N, N+3))
-    3
+    >>> len(lrange(N, N+3)) == 3
+    True
     >>> xrange(N)           #doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
