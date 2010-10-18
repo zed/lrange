@@ -28,6 +28,10 @@ try: long
 except NameError:
     long = int # Python 3.x
 
+try: xrange
+except NameError:
+    xrange = range # Python 3.x
+
 try: any
 except NameError:
     def any(iterable): # for Python 2.4
@@ -35,6 +39,13 @@ except NameError:
             if i:
                 return True
         return False
+
+import sys as _sys
+if hasattr(_sys, "maxint"):
+    _MAXINT = _sys.maxint
+else:
+    _MAXINT = _sys.maxsize # Python 3.x
+
 
 def _toindex(arg):
     """Convert `arg` to integer type that could be used as an index.
@@ -122,7 +133,12 @@ class lrange(object):
         else:
             return (hi - lo - 1) // step + 1
 
-    __len__ = length
+    def __len__(self):
+        L = self.length
+        if L > _MAXINT:
+            raise OverflowError(
+                "cannot fit '%.200s' into an index-sized integer" % type(L).__name__)
+        return int(L)
 
     length = property(length)
 

@@ -6,25 +6,64 @@ Usage:
 
 Requires: nose (``$ pip install nose``)
 """
+from __future__ import nested_scopes
 import pickle
 import sys
+import unittest
 
 try: long
 except NameError:
-    long = int # Python 3.x
+    long = int           # Python 3.x
 
 try: xrange
 except NameError:
-    xrange = range # Python 3.x
+    xrange = range       # Python 3.x
+
+from nose import SkipTest
+from nose.tools import assert_raises, eq_ as eq, make_decorator, raises
+
+from lrange import lrange
+
 
 if hasattr(sys, "maxint"):
     MAXINT = sys.maxint
 else:
     MAXINT = sys.maxsize # Python 3.x
 
-from nose.tools import assert_raises, eq_ as eq, raises
+BIGINT = 10**200
 
-from lrange import lrange
+
+def skipif(predicate, msg=None):
+    """Skip the test if `predicate()` is true."""
+    if msg is None:
+        msg = predicate.__name__
+
+    def decorator(test_fun):
+        @make_decorator(test_fun)
+        def wrapper(*args, **kwargs):
+            if not predicate():
+                return test_fun(*args, **kwargs)
+            else:
+                raise SkipTest(msg)
+        return wrapper
+    return decorator
+
+
+def ispypy():
+    """Whether the running interpreter is pypy."""
+    return hasattr(sys, 'pypy_version_info')
+
+
+def isjython():
+    """Whether the running interpreter is jython."""
+    return sys.platform.startswith('java')
+
+def eq_range(a, start, stop, step):
+    """Assert that `a` is a range defined by `start`, `stop`, `step`."""
+    i = start
+    for j in a:
+        eq(j, i)
+        i += step
 
 
 def eq_lrange(a, b):
@@ -32,16 +71,14 @@ def eq_lrange(a, b):
 
     Where `a`, `b` are `lrange` objects
     """
-    assert a._start == b._start
-    assert a._stop == b._stop
-    assert a._step == b._step
-    assert a.length == b.length
-    if a.length < 100:
-        assert list(a) == list(b)
-        try:
-             assert list(a) == list(range(a._start, a._stop, a._step))
-        except OverflowError:
-            pass
+    eq(a._start, b._start)
+    eq(a._stop, b._stop)
+    eq(a._step, b._step)
+    eq(a.length, b.length)
+    
+    if a.length < 100: # test equility for small ranges
+        eq(list(a), list(b))
+        eq_range(a, a._start, a._stop, a._step)
 
 
 def _get_short_lranges_args():
@@ -139,16 +176,24 @@ def test_empty_range():
         "-3 -3",
         ):
         r = lrange(*[int(a) for a in args.split()])
-        assert len(r) == 0
+        eq(len(r), 0)
         L = list(r)
-        assert len(L) == 0
+        eq(len(L), 0)
 
 
 def test_small_ints():
     for args in _get_short_lranges_args():
         ir, r = lrange(*args), xrange(*args)
-        assert len(ir) == len(r)
-        assert list(ir) == list(r)
+        eq(len(ir), len(r))
+        eq(list(ir), list(r))
+
+
+def test_len_type():
+    ir = lrange(10)
+    eq(type(len(ir)), int)
+    eq(type(len(xrange(10))), int)
+    eq(type(len(range(10))), int)
+
 
 def test_big_ints():
     N = 10**100
@@ -158,39 +203,46 @@ def test_big_ints():
         [(N, N-10, -2), 5],
         ]:
         ir = lrange(*args)
-        assert ir.length == len_
-        try:
-            assert ir.length == len(ir)
-        except OverflowError:
-            pass
         #
         ir[ir.length-1]
         #
         if len(args) >= 2:
             r = range(*args)
-            assert list(ir) == list(r)
-            assert ir[ir.length-1] == r[-1]
-            assert list(reversed(ir)) == list(reversed(r))
-        #
+            eq(list(ir), list(r))
+            eq(ir[ir.length-1], r[-1])
+            eq(list(reversed(ir)), list(reversed(r)))
 
 
 def test_negative_index():
-    assert lrange(10)[-1] == 9
-    assert lrange(2**100+1)[-1] == 2**100
+    eq(lrange(10)[-1], 9)
+    eq(lrange(2**100+1)[-1], 2**100)
 
 
 def test_reversed():
     for r in _get_lranges():
         if r.length > 1000: continue # skip long
-        assert list(reversed(reversed(r))) == list(r)
-        assert list(r) == list(range(r._start, r._stop, r._step))
+        eq(list(reversed(list(reversed(r)))), list(r))
+        eq_range(r, r._start, r._stop, r._step)
 
 
-def test_pickle():
-    for proto in range(pickle.HIGHEST_PROTOCOL + 1):
-        for r in _get_lranges():
+def test_pickle_all_but_highest_protocol():    
+    for proto in range(pickle.HIGHEST_PROTOCOL):
+        yield _test_pickle, proto
+
+@skipif(ispypy, msg="known failure. It causes 'segmentation fault' with pypy-c")
+def test_pickle_highest_protocol():
+    yield _test_pickle, pickle.HIGHEST_PROTOCOL
+    yield _test_pickle, -1
+    yield _test_pickle, None
+
+
+def _test_pickle(proto):
+    for r in _get_lranges():
+        if proto is None:
+            rp = pickle.loads(pickle.dumps(r))
+        else:
             rp = pickle.loads(pickle.dumps(r, proto))
-            eq_lrange(rp, r)
+        eq_lrange(rp, r)
 
 
 def test_equility():
@@ -198,9 +250,9 @@ def test_equility():
         a, b = lrange(*args), lrange(*args)
         assert a is not b
         assert a != b
-        assert a.length == b.length
+        eq(a.length, b.length)
         if a.length < 1000: # skip long
-            assert list(a) == list(b), (a, b)
+            eq(list(a), list(b), (a, b))
         eq_lrange(a, b)
 
 
@@ -273,10 +325,10 @@ class _indices(object):
                     if N is not None:
                         s = s + N
                     lr = lrange(s)
-                    assert lr.length == s
+                    eq(lr.length, s)
 
 def test_new():
-    assert repr(lrange(True)) == repr(lrange(1))
+    eq(repr(lrange(True)), repr(lrange(1)))
     #
     try:
         lrange(None)
@@ -295,17 +347,33 @@ def test_overflow():
     lo, hi, step = MAXINT-2, 4*MAXINT+3, MAXINT // 10
     lr = lrange(lo, hi, step)
     xr = lrange(MAXINT//4, MAXINT//2, MAXINT // 10)
-    assert list(lr) == list(range(lo, hi, step))
+    eq(list(lr), list(range(lo, hi, step)))
 
 
 def test_getitem():
     r = lrange(MAXINT-2, MAXINT+3)
     L = []
     L[:] = r
-    assert len(L) == len(r)
-    assert L == list(r)
+    eq(len(L), len(r))
+    eq(L, list(r))
+
+
+class TestBIGINT(unittest.TestCase):
+
+    def setUp(self):
+        self.lr = lrange(BIGINT)
+
+    def test_big_length(self):
+        eq(self.lr.length, BIGINT)
+
+    @raises(OverflowError)
+    def test_overflow_len(self):
+        len(self.lr)
+
+    def tearDown(self):
+        self.lr = None
 
 
 if __name__ == "__main__":
     import nose
-    nose.main()
+    sys.exit(nose.main())
