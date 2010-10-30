@@ -4,3 +4,6 @@ build/
 .tox/
 *.egg/
 *.py[co]
+/.coverage
+/cover/
+/htmlcov/
