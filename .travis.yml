@@ -1,15 +1,11 @@
 language: python
 script: tox
 install:
-  - pip install tox
+    - pip install tox
 env:
-  global:
-    - PYTHONWARNINGS=always::DeprecationWarning
-  matrix:
     - TOXENV=py26
     - TOXENV=py27
     - TOXENV=py32
     - TOXENV=py33
     - TOXENV=py34
     - TOXENV=pypy
-sudo: false
