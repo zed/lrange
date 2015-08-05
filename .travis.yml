@@ -1,5 +1,5 @@
 language: python
-script: tox -e $TOX_ENV
+script: tox -e $TOXENV
 install:
   - pip install tox
 env:
