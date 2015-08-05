@@ -1,6 +1,9 @@
 lrange - unlimited xrange in pure Python
 ========================================
 
+.. image:: https://travis-ci.org/zed/lrange.png?branch=master
+        :target: https://travis-ci.org/zed/lrange
+
 `lrange` is a lazy range function for Python 2.x or `xrange` drop-in
 replacement for long integers.
 
