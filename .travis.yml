@@ -10,5 +10,6 @@ env:
     - TOXENV=py33
     - TOXENV=py34
     - TOXENV=pypy
+    - TOXENV=py2-cover,py3-cover,coverage
 after_success:
   coveralls
