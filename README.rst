@@ -1,8 +1,11 @@
 lrange - unlimited xrange in pure Python
 ========================================
 
-.. image:: https://travis-ci.org/zed/lrange.png?branch=master
-        :target: https://travis-ci.org/zed/lrange
+.. image:: https://img.shields.io/coveralls/zed/lrange.svg
+    :target: https://coveralls.io/r/zed/lrange
+
+.. image:: https://img.shields.io/travis/zed/lrange/master.svg
+    :target: https://travis-ci.org/zed/lrange
 
 `lrange` is a lazy range function for Python 2.x or `xrange` drop-in
 replacement for long integers.
@@ -33,4 +36,4 @@ Python 3.x.
 Files are licensed under the MIT License. See the file MIT-LICENSE.txt
 for details.
 
-The latest version is at http://github.com/zed/lrange/
+The latest version is at https://github.com/zed/lrange/

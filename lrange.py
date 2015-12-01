@@ -33,7 +33,7 @@ except NameError:
     xrange = range # Python 3.x
 
 try: any
-except NameError:
+except NameError: # pragma: no cover
     def any(iterable): # for Python 2.4
         for i in iterable:
             if i:
