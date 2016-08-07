@@ -1,11 +1,13 @@
 import os
 
-try: import setuptools
+try:
+    import setuptools
 except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
 
 from setuptools import setup
+
 
 def read_file(relpath):
     return open(os.path.join(os.path.dirname(__file__), relpath)).read()
@@ -22,18 +24,18 @@ Programming Language :: Python :: 3
 Topic :: Software Development :: Libraries :: Python Modules
 """
 
-NAME             = 'lrange'
-VERSION          = '0.0.6'
-DESCRIPTION      = _readme_lines[0]
+NAME = 'lrange'
+VERSION = '0.0.6'
+DESCRIPTION = _readme_lines[0]
 LONG_DESCRIPTION = "\n".join(_readme_lines[2:])
-URL              = "http://github.com/zed/lrange/"
-DOWNLOAD_URL     = ("http://pypi.python.org/packages/source/l/lrange/"
-                    "lrange-%s.tar.gz" % (VERSION,))
-LICENSE          = 'MIT'
-CLASSIFIERS      = filter(len, CLASSIFIERS.split('\n'))
-AUTHOR           = "zed"
-AUTHOR_EMAIL     = "arn.zart+zed@gmail.com"
-PLATFORMS        = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"]
+URL = "http://github.com/zed/lrange/"
+DOWNLOAD_URL = ("http://pypi.python.org/packages/source/l/lrange/"
+                "lrange-%s.tar.gz" % (VERSION,))
+LICENSE = 'MIT'
+CLASSIFIERS = list(filter(len, CLASSIFIERS.split('\n')))
+AUTHOR = "zed"
+AUTHOR_EMAIL = "arn.zart+zed@gmail.com"
+PLATFORMS = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"]
 
 setup(
     name=NAME,
@@ -49,7 +51,8 @@ setup(
     maintainer=AUTHOR,
     maintainer_email=AUTHOR_EMAIL,
     platforms=PLATFORMS,
-    tests_require=['nose'], #NOTE: setup.py test might fail on the first attempt
+    # NOTE: setup.py test might fail on the first attempt
+    tests_require=['nose'],
     test_suite="nose.collector",
     py_modules=[NAME],
     provides=[NAME],
