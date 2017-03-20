@@ -405,6 +405,9 @@ class TestBIGINT(unittest.TestCase):
     def test_overflow_len(self):
         len(self.lr)
 
+    def test_bool(self):
+        self.assertTrue(self.lr)
+
     def tearDown(self):
         self.lr = None
 

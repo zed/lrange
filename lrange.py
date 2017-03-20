@@ -140,6 +140,11 @@ class lrange(object):
                 "cannot fit '%.200s' into an index-sized integer" % type(L).__name__)
         return int(L)
 
+    def __bool__(self):
+        return bool(self.length)
+
+    __nonzero__ = __bool__
+
     length = property(length)
 
     def __getitem__(self, i):
