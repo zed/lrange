@@ -25,7 +25,7 @@ Topic :: Software Development :: Libraries :: Python Modules
 """
 
 NAME = 'lrange'
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 DESCRIPTION = _readme_lines[0]
 LONG_DESCRIPTION = "\n".join(_readme_lines[2:])
 URL = "http://github.com/zed/lrange/"
